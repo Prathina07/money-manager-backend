@@ -10,25 +10,28 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/expenses")
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins="*")
 public class ExpenseController {
 
     @Autowired
     private ExpenseRepository expenseRepository;
 
-    // GET ALL EXPENSES
     @GetMapping
     public List<Expense> getAllExpenses() {
         return expenseRepository.findAll();
     }
 
-    // ADD EXPENSE
-   @PostMapping
-public Expense addExpense(@RequestBody Expense expense) {
-    return expenseRepository.save(expense);
-}
+    @PostMapping
+    public Expense addExpense(@RequestBody Expense expense) {
+        return expenseRepository.save(expense);
+    }
 
-    // DELETE EXPENSE
+    @PutMapping("/{id}")
+    public Expense updateExpense(@PathVariable Long id, @RequestBody Expense expense) {
+        expense.setId(id);
+        return expenseRepository.save(expense);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteExpense(@PathVariable Long id) {
         expenseRepository.deleteById(id);
