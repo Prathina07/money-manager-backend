@@ -17,10 +17,17 @@ public class AuthController {
     private UserRepository userRepository;
 
     // REGISTER
-    @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        return userRepository.save(user);
+   @PostMapping("/register")
+public ResponseEntity<?> register(@RequestBody User user) {
+
+    User existingUser = userRepository.findByUsername(user.getUsername());
+
+    if (existingUser != null) {
+        return ResponseEntity.badRequest().body("Username already exists");
     }
+
+    return ResponseEntity.ok(userRepository.save(user));
+}
     @GetMapping("/users")
 public List<User> getAllUsers() {
     return userRepository.findAll();

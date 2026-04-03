@@ -12,7 +12,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)   // ✅ ADD THIS
     private String username;
+
     private String email;
+
     private String password;
 }
