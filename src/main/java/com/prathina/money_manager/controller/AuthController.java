@@ -29,13 +29,18 @@ public List<User> getAllUsers() {
 @PostMapping("/login")
 public ResponseEntity<?> login(@RequestBody User user) {
 
+    if (user.getUsername() == null || user.getPassword() == null) {
+        return ResponseEntity.badRequest().body("Username or password missing");
+    }
+
     User existingUser = userRepository.findByUsername(user.getUsername());
 
     if (existingUser == null) {
         return ResponseEntity.status(401).body("User not found");
     }
 
-    if (!existingUser.getPassword().equals(user.getPassword())) {
+    if (existingUser.getPassword() == null ||
+        !existingUser.getPassword().equals(user.getPassword())) {
         return ResponseEntity.status(401).body("Wrong password");
     }
 
