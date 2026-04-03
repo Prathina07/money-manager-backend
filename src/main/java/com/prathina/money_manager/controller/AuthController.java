@@ -20,14 +20,15 @@ public class AuthController {
    @PostMapping("/register")
 public ResponseEntity<?> register(@RequestBody User user) {
 
-    User existingUser = userRepository.findByUsername(user.getUsername());
+    List<User> users = userRepository.findByUsername(user.getUsername());
 
-    if (existingUser != null) {
+    if (!users.isEmpty()) {
         return ResponseEntity.badRequest().body("Username already exists");
     }
 
     return ResponseEntity.ok(userRepository.save(user));
 }
+
     @GetMapping("/users")
 public List<User> getAllUsers() {
     return userRepository.findAll();
@@ -36,33 +37,19 @@ public List<User> getAllUsers() {
 @PostMapping("/login")
 public ResponseEntity<?> login(@RequestBody User user) {
 
-    try {
-        System.out.println("LOGIN HIT"); // debug
+    List<User> users = userRepository.findByUsername(user.getUsername());
 
-        if (user == null) {
-            return ResponseEntity.badRequest().body("User is null");
-        }
-
-        System.out.println("Username: " + user.getUsername());
-        System.out.println("Password: " + user.getPassword());
-
-        User existingUser = userRepository.findByUsername(user.getUsername());
-
-        System.out.println("DB User: " + existingUser);
-
-        if (existingUser == null) {
-            return ResponseEntity.status(401).body("User not found");
-        }
-
-        if (!existingUser.getPassword().equals(user.getPassword())) {
-            return ResponseEntity.status(401).body("Wrong password");
-        }
-
-        return ResponseEntity.ok(existingUser);
-
-    } catch (Exception e) {
-        e.printStackTrace(); // 🔥 THIS IS KEY
-        return ResponseEntity.status(500).body("ERROR: " + e.getMessage());
+    if (users.isEmpty()) {
+        return ResponseEntity.status(401).body("User not found");
     }
+
+    // take first user (avoid duplicate crash)
+    User existingUser = users.get(0);
+
+    if (!existingUser.getPassword().equals(user.getPassword())) {
+        return ResponseEntity.status(401).body("Wrong password");
+    }
+
+    return ResponseEntity.ok(existingUser);
 }
 }
