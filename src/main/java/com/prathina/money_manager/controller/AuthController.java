@@ -37,19 +37,25 @@ public List<User> getAllUsers() {
 @PostMapping("/login")
 public ResponseEntity<?> login(@RequestBody User user) {
 
-    List<User> users = userRepository.findByUsername(user.getUsername());
+    try {   // 🔴 START here
 
-    if (users.isEmpty()) {
-        return ResponseEntity.status(401).body("User not found");
+        List<User> users = userRepository.findByUsername(user.getUsername());
+
+        if (users.isEmpty()) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+
+        User existingUser = users.get(0);
+
+        if (!existingUser.getPassword().equals(user.getPassword())) {
+            return ResponseEntity.status(401).body("Wrong password");
+        }
+
+        return ResponseEntity.ok(existingUser);
+
+    } catch (Exception e) {   // 🔴 END here
+        e.printStackTrace();  // prints error in Render logs
+        return ResponseEntity.status(500).body("ERROR: " + e.getMessage());
     }
-
-    // take first user (avoid duplicate crash)
-    User existingUser = users.get(0);
-
-    if (!existingUser.getPassword().equals(user.getPassword())) {
-        return ResponseEntity.status(401).body("Wrong password");
-    }
-
-    return ResponseEntity.ok(existingUser);
 }
 }
