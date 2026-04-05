@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Data
-@JsonFormat(pattern = "yyyy-MM-dd")
 @Table(name="expenses")
 public class Expense {
 
@@ -19,8 +18,9 @@ public class Expense {
     private Double amount;
     private String type;
     private String category;
-    private LocalDate date;
-    // LINK EXPENSE TO USER
-    private Long userId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
+
+    private Long userId;
 }
